@@ -1,164 +1,52 @@
 :root{
-  --pink1:#ff7ab6;
-  --pink2:#ff4da6;
-  --accent:#ffd6ea;
-  --soft:#ffeef8;
-  --win-bg: rgba(255,255,255,0.06);
+  --acc:#00e5a0; --acc2:#22d3ee; --warn:#f59e0b; --bad:#f87171;
+  --bg:#070d12; --panel:rgba(10,20,28,.92); --line:rgba(0,229,160,.25);
 }
-
-/* reset */
 *{box-sizing:border-box}
-html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial}
+html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;background:var(--bg);color:#e6f4ee}
 .hidden{display:none}
-
-/* LOGIN OVERLAY */
-.overlay{
-  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.6));
-  z-index:1000;
-}
-.login-card{
-  width:320px;padding:28px;border-radius:14px;
-  background:linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-  border:2px solid rgba(255,255,255,0.06);backdrop-filter: blur(6px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
-  text-align:center;color:white;
-}
-.login-card h1{margin:0 0 6px;font-size:28px;color:var(--pink2);text-shadow:0 2px 12px rgba(255,77,166,0.12)}
-.muted{color:rgba(255,255,255,0.75)}
-.small{font-size:12px;margin-top:10px}
-.txt{
-  width:100%;padding:12px;border-radius:10px;margin:10px 0;border:2px solid rgba(255,255,255,0.08);
-  background:rgba(0,0,0,0.4);color:#fff;font-size:15px;outline:none;
-  box-shadow: 0 0 10px rgba(255,122,182,0.08) inset;
-}
-.btn{
-  width:100%;padding:10px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--pink1),var(--pink2));
-  color:white;font-weight:600;font-size:16px;cursor:pointer;
-  box-shadow:0 8px 20px rgba(255,77,166,0.18);
-}
+.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 20%, rgba(0,229,160,.18), transparent 55%), rgba(0,0,0,.75);z-index:1000}
+.login-card{width:360px;max-width:92vw;padding:28px;border-radius:16px;background:var(--panel);border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.6);text-align:center}
+.login-card h1{margin:6px 0;font-size:32px;color:var(--acc);letter-spacing:.5px}
+.shield-mark{font-size:44px}
+.muted{color:rgba(230,244,238,.75)}
+.small{font-size:12px;margin-top:10px;line-height:1.5}
+.txt{width:100%;padding:12px;border-radius:10px;margin:8px 0;border:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.45);color:#fff;font-size:15px;outline:none}
+.txt:focus{border-color:var(--acc)}
+.btn{width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--acc),var(--acc2));color:#04140e;font-weight:800;font-size:16px;cursor:pointer}
 .btn:active{transform:translateY(1px)}
-
-/* DESKTOP & WALLPAPER */
-.wallpaper{
-  position:fixed;inset:0;background: radial-gradient(ellipse at 20% 30%, rgba(255,218,240,0.12), transparent 20%),
-    linear-gradient(135deg,#ffe6f5 0%, #ffd6ea 40%, #ffd1f0 100%);
-  filter: saturate(110%);background-attachment: fixed;
-}
-
-/* floating hearts container (absolute over wallpaper) */
-.floating-hearts{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:2}
-
-/* icons */
-.icons{
-  position:absolute;left:30px;top:70px;display:flex;flex-direction:column;gap:14px;z-index:10;
-}
-.icon{
-  width:92px;height:92px;border-radius:14px;background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-  border:2px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;justify-content:center;
-  color:white;cursor:pointer;backdrop-filter: blur(4px);
-  transition:transform .18s ease, box-shadow .2s;
-  box-shadow: 0 6px 18px rgba(255,77,166,0.06);
-}
-.icon:hover{transform:translateY(-6px);box-shadow: 0 16px 40px rgba(255,77,166,0.12)}
-.icon span{font-size:14px;margin-top:8px;color:#fff}
-.heart-icon{width:36px;height:36px;fill:var(--pink2);filter: drop-shadow(0 6px 12px rgba(255,77,166,0.12))}
-
-/* windows container */
-#windows{position:absolute;left:180px;top:60px;right:30px;bottom:60px;pointer-events:auto;z-index:20}
-
-/* window style */
-.app-window{
-  width:540px;max-width:calc(100% - 220px);
-  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
-  border-radius:12px;border:1px solid rgba(255,255,255,0.06);
-  overflow:hidden;box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-  position:relative;
-}
-.app-header{
-  height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-  border-bottom:1px solid rgba(255,255,255,0.02);
-}
-.app-title{color:var(--pink2);font-weight:700}
-.app-body{padding:22px;color:#fff}
-
-/* typewriter text */
-.typewriter{font-size:18px;line-height:1.5;color:#fff;margin-top:12px;min-height:66px}
-.greet{font-size:24px;font-weight:800;color:#fff;text-shadow:0 6px 24px rgba(255,77,166,0.14)}
-
-/* heart button */
-.heart-btn{
-  margin-top:14px;padding:14px 18px;border-radius:12px;border:none;cursor:pointer;
-  background:linear-gradient(90deg,var(--pink2),#ff3d9a);color:white;font-weight:700;
-  box-shadow: 0 10px 26px rgba(255,77,166,0.14);
-}
-.heart-burst{
-  pointer-events:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9999;
-}
-
-/* taskbar */
-.taskbar{
-  position:fixed;left:0;right:0;bottom:0;height:56px;background:linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.28));
-  display:flex;align-items:center;justify-content:space-between;padding:0 18px;color:white;z-index:999;
-  border-top:1px solid rgba(255,255,255,0.03)
-}
-.taskbar-left{font-weight:700;color:var(--pink2)}
-.taskbar-right{opacity:0.9}
-
-/* small helper */
-.muted{opacity:0.85;color:#fff}
-
-/* heart animation keyframes */
-@keyframes popUp {
-  from{transform: translateY(12px) scale(.6); opacity:0}
-  30%{opacity:1}
-  to{transform: translateY(-140px) scale(1); opacity:0}
-}
-
-/* Default app window style for all apps */
-.app-windowss {
-  position: absolute;
-  top: 100px;
-  left: 100px;
-  width: 700px;
-  height: 650px;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.3);
-  overflow: hidden;
-}
-
-/* Floating style for terminal only */
-.app-windowss.terminal {
-  background: transparent;
-  box-shadow: 0 0 20px rgba(255, 0, 100, 0.6);
-  border-radius: 10px;
-}
-
-/* Hide titlebar for terminal */
-.app-windowss.terminal .app-titlebar {
-  display: none;
-}
-
-/* Full iframe height when titlebar is gone */
-.app-windowss.terminal .app-content {
-  height: 100%;
-}
-
-
-.floating-terminal {
-  position: absolute;
-  top: 100px;
-  left: 300px;
-  z-index: 9999;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 0 20px rgba(255, 0, 100, 0.6);
-}
-
-.terminal-content {
-  width: 660px;
-  height: 415px;
-  border: none;
-}
+.btn.mini{width:auto;padding:8px 14px;font-size:14px}
+.wallpaper{position:fixed;inset:0;background:radial-gradient(ellipse at 20% 10%, rgba(0,229,160,.14), transparent 45%),radial-gradient(ellipse at 85% 90%, rgba(34,211,238,.12), transparent 40%),linear-gradient(135deg,#071018 0%, #0a1a24 55%, #071018 100%)}
+.scan-grid{position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(0,229,160,.06) 1px, transparent 1px),linear-gradient(90deg, rgba(0,229,160,.06) 1px, transparent 1px);background-size:44px 44px;z-index:1}
+.icons{position:absolute;left:24px;top:64px;display:flex;flex-direction:column;gap:12px;z-index:10}
+.icon{width:104px;padding:12px 6px;border-radius:14px;background:rgba(10,20,28,.8);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#e6f4ee;cursor:pointer;text-align:center}
+.icon:hover{transform:translateY(-3px);border-color:var(--acc)}
+.icon b{font-size:28px}
+.icon span{font-size:12px;margin-top:6px;line-height:1.3}
+#windows{position:absolute;left:150px;top:56px;right:20px;bottom:96px;z-index:20}
+.app-window{width:640px;max-width:calc(100vw - 180px);max-height:calc(100vh - 170px);display:flex;flex-direction:column;background:var(--panel);border-radius:14px;border:1px solid var(--line);overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.6);position:absolute;left:20px;top:10px}
+.app-header{height:52px;flex:0 0 52px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:rgba(0,229,160,.12);border-bottom:1px solid var(--line);cursor:grab}
+.app-title{font-weight:800;color:var(--acc)}
+.app-body{padding:18px;overflow:auto;color:#e6f4ee}
+.app-body h3{margin:0 0 10px}
+.app-body p{line-height:1.55}
+.closeBtn{background:transparent;border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 10px;cursor:pointer}
+.field{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.4);color:#fff;margin:6px 0}
+textarea.field{min-height:110px;font-family:ui-monospace, monospace}
+.result{margin-top:12px;padding:12px;border-radius:10px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.12);line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.result.good{border-color:rgba(0,229,160,.5)}
+.result.warn{border-color:rgba(245,158,11,.6)}
+.result.bad{border-color:rgba(248,113,113,.6)}
+.chip{display:inline-block;padding:4px 8px;border-radius:20px;font-size:12px;font-weight:700;margin:2px;background:rgba(0,229,160,.15);border:1px solid var(--line)}
+.inc{border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:12px;margin:10px 0;background:rgba(0,0,0,.25)}
+.inc button{margin:4px 6px 0 0}
+.ticker{position:fixed;left:0;right:0;bottom:56px;height:34px;display:flex;align-items:center;padding:0 16px;background:rgba(0,0,0,.65);border-top:1px solid var(--line);color:#a7f3d0;font-size:13px;z-index:998;overflow:hidden;white-space:nowrap}
+.taskbar{position:fixed;left:0;right:0;bottom:0;height:56px;background:rgba(3,10,14,.95);display:flex;align-items:center;justify-content:space-between;padding:0 18px;z-index:999;border-top:1px solid var(--line)}
+.taskbar-left{font-weight:800;color:var(--acc)}
+.toolbar{position:fixed;top:0;left:0;right:0;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:rgba(3,10,14,.95);border-bottom:1px solid var(--line);z-index:990}
+.toolbar button{background:rgba(0,229,160,.12);border:1px solid var(--line);color:#e6f4ee;border-radius:8px;padding:7px 11px;cursor:pointer;margin-right:6px}
+.menu{position:relative}
+.menu-dropdown{position:absolute;top:44px;left:0;min-width:260px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px;z-index:1001}
+.menu-item{padding:10px;border-radius:8px;cursor:pointer}
+.menu-item:hover{background:rgba(0,229,160,.15)}
+@media (max-width:700px){#windows{left:10px;right:10px}.icons{display:none}.app-window{max-width:calc(100vw - 20px)}}

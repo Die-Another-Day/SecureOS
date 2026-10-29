@@ -1,219 +1,118 @@
-/* LoveOS client logic with Toolbar */
+/* SecureOS v1.0 — desktop shell + window manager.
+   Demo login only: passphrase "secure". All apps are local-first. */
+document.addEventListener("DOMContentLoaded", () => {
+  const loginOverlay = document.getElementById("loginOverlay");
+  const loginBtn = document.getElementById("loginBtn");
+  const usernameInput = document.getElementById("username");
+  const passwordInput = document.getElementById("password");
+  const loginMsg = document.getElementById("loginMsg");
+  const desktop = document.getElementById("desktop");
+  const taskUser = document.getElementById("taskUser");
+  const windows = document.getElementById("windows");
+  const iconsEl = document.getElementById("desktopIcons");
+  const ticker = document.getElementById("ticker");
 
-document.addEventListener('DOMContentLoaded', () => {
-  // DOM refs
-  const loginOverlay = document.getElementById('loginOverlay');
-  const loginBtn = document.getElementById('loginBtn');
-  const usernameInput = document.getElementById('username');
-  const passwordInput = document.getElementById('password');
-  const loginMsg = document.getElementById('loginMsg');
-  const desktop = document.getElementById('desktop');
-  const taskUser = document.getElementById('taskUser');
-  const loveIcon = document.getElementById('loveIcon');
-  const windows = document.getElementById('windows');
-  const floatingHearts = document.getElementById('floatingHearts');
+  const SECRET = "secure"; // demo passphrase, not real auth
+  let zTop = 100;
 
-  const SECRET = 'love'; // default password
+  const APPS = [
+    { id: "soc", icon: "🛡️", label: "SOC Center" },
+    { id: "password", icon: "🔑", label: "Password Lab" },
+    { id: "hash", icon: "#️⃣", label: "Hash Lab" },
+    { id: "phishing", icon: "🎣", label: "Phishing Analyzer" },
+    { id: "logs", icon: "📜", label: "Log Analyzer" },
+    { id: "vault", icon: "🔒", label: "Vault Notes" },
+    { id: "netlab", icon: "🌐", label: "Network Lab" },
+    { id: "intel", icon: "🧠", label: "Threat Intel" },
+    { id: "terminal", icon: "💻", label: "Secure Terminal" },
+  ];
 
-  // Inject Toolbar into DOM
-  function createToolbar() {
-    const toolbar = document.createElement('div');
-    toolbar.id = 'love-toolbar';
-    toolbar.innerHTML = `
-      <div class="toolbar-left">
-        <button id="menuBtn">☰</button>
-        <div id="menuDropdown" class="hidden">
-          <div class="menu-item" data-app="terminal">💻 Love Terminal</div>
-          <div class="menu-item" data-app="notes">📜 Love Notes</div>
-          <div class="menu-item" data-app="files">📂 Memory Chest</div>
-          <div class="menu-item" data-app="settings">⚙️ Cupid Settings</div>
-          <div class="menu-item" data-app="messages">💌 Message Box</div>
-        </div>
-        <button class="shortcut" data-app="notes">📜 Love Notes</button>
-        <button class="shortcut" data-app="terminal">💻 Love Terminal</button>
-      </div>
-      <div class="toolbar-right">
-        <button id="logoutBtn">💔 Break Up</button>
-        <div class="time-date">
-          <div id="clock"></div>
-          <div class="phrase">Every second with you matters</div>
+  function createToolbar(name) {
+    const bar = document.createElement("div");
+    bar.className = "toolbar";
+    bar.innerHTML = `
+      <div class="menu">
+        <button id="menuBtn">☰ Start</button>
+        <div id="menuDropdown" class="menu-dropdown hidden">
+          ${APPS.map((a) => `<div class="menu-item" data-app="${a.id}">${a.icon} ${a.label}</div>`).join("")}
         </div>
       </div>
-    `;
-    document.body.prepend(toolbar);
-
-    // Toolbar events
-    const menuBtn = toolbar.querySelector('#menuBtn');
-    const menuDropdown = toolbar.querySelector('#menuDropdown');
-    menuBtn.addEventListener('click', () => {
-      menuDropdown.classList.toggle('hidden');
+      <div>
+        <button id="socBtn">🛡️ SOC Center</button>
+        <button id="termBtn">💻 Terminal</button>
+        <span class="muted small" id="clock"></span>
+        <button id="logoutBtn">⏻ Lock</button>
+      </div>`;
+    document.body.prepend(bar);
+    const dd = bar.querySelector("#menuDropdown");
+    bar.querySelector("#menuBtn").addEventListener("click", () => dd.classList.toggle("hidden"));
+    bar.querySelectorAll(".menu-item").forEach((el) => el.addEventListener("click", () => { dd.classList.add("hidden"); openApp(el.dataset.app); }));
+    bar.querySelector("#socBtn").addEventListener("click", () => openApp("soc"));
+    bar.querySelector("#termBtn").addEventListener("click", () => openApp("terminal"));
+    bar.querySelector("#logoutBtn").addEventListener("click", () => {
+      if (confirm("Lock SecureOS and return to the login screen?")) { localStorage.removeItem("secureos_user"); location.reload(); }
     });
-
-    // App shortcuts
-    toolbar.querySelectorAll('.shortcut, .menu-item').forEach(btn => {
-      btn.addEventListener('click', () => {
-        alert(`Opening: ${btn.dataset.app}`);
-        menuDropdown.classList.add('hidden');
-      });
-    });
-
-    // Logout
-    toolbar.querySelector('#logoutBtn').addEventListener('click', () => {
-      if (confirm('Are you sure you want to log out of Love OS?')) {
-        localStorage.removeItem('loveos_user');
-        location.reload();
-      }
-    });
-
-    // Clock updater
-    function updateClock() {
-      const now = new Date();
-      toolbar.querySelector('#clock').textContent = now.toLocaleTimeString();
-    }
-    updateClock();
-    setInterval(updateClock, 1000);
+    const clock = bar.querySelector("#clock");
+    const tick = () => { clock.textContent = new Date().toLocaleTimeString(); };
+    tick(); setInterval(tick, 1000);
   }
 
-  // show desktop
+  function openApp(id) {
+    const app = APPS.find((a) => a.id === id);
+    const def = window.SecureApps && window.SecureApps[id];
+    if (!app || !def) { alert("App not available: " + id); return; }
+    const existing = document.querySelector(`.app-window[data-app="${id}"]`);
+    if (existing) { existing.style.zIndex = ++zTop; return; }
+    const win = document.createElement("div");
+    win.className = "app-window";
+    win.dataset.app = id;
+    win.style.zIndex = ++zTop;
+    win.innerHTML = `<div class="app-header"><div class="app-title">${def.title}</div><button class="closeBtn" title="Close">✕</button></div><div class="app-body"></div>`;
+    const body = win.querySelector(".app-body");
+    body.innerHTML = def.html();
+    windows.appendChild(win);
+    win.querySelector(".closeBtn").addEventListener("click", () => win.remove());
+    win.addEventListener("mousedown", () => { win.style.zIndex = ++zTop; });
+    // Drag by header
+    const header = win.querySelector(".app-header");
+    let ox = 0, oy = 0, down = false;
+    header.addEventListener("mousedown", (e) => { down = true; ox = e.clientX - win.offsetLeft; oy = e.clientY - win.offsetTop; });
+    document.addEventListener("mouseup", () => { down = false; });
+    document.addEventListener("mousemove", (e) => { if (!down) return; win.style.left = Math.max(0, e.clientX - ox) + "px"; win.style.top = Math.max(0, e.clientY - oy) + "px"; });
+    try { def.init(body); } catch (err) { body.innerHTML += `<div class="result bad">App failed to start: ${err.message}</div>`; }
+  }
+  window.SecureOS_openApp = openApp;
+
   function showDesktop(name) {
-    loginOverlay.classList.add('hidden');
-    loginOverlay.style.display = 'none';
-    desktop.classList.remove('hidden');
-    taskUser.textContent = name || 'guest';
-    localStorage.setItem('loveos_user', name || 'guest');
-    startFloatingHearts();
-    createToolbar();
+    loginOverlay.classList.add("hidden");
+    loginOverlay.style.display = "none";
+    desktop.classList.remove("hidden");
+    taskUser.textContent = name + "  •  SecureOS v1.0";
+    localStorage.setItem("secureos_user", name);
+    iconsEl.innerHTML = APPS.map((a) => `<div class="icon" data-app="${a.id}"><b>${a.icon}</b><span>${a.label}</span></div>`).join("");
+    iconsEl.querySelectorAll(".icon").forEach((el) => el.addEventListener("click", () => openApp(el.dataset.app)));
+    createToolbar(name);
+    openApp("soc");
+    const alerts = [
+      "🛡️ SOC: 4 simulated incidents awaiting triage — open SOC Center",
+      "🔑 Password Lab: test a password locally, generate a passphrase",
+      "🎣 Phishing Analyzer: paste a link — it is never opened or fetched",
+      "📜 Log Analyzer: brute-force, SQLi and traversal patterns, counted locally",
+      "🔒 Vault Notes: AES-GCM encrypted notes, stored only in this browser",
+    ];
+    let ai = 0;
+    setInterval(() => { if (ticker) ticker.textContent = alerts[ai++ % alerts.length]; }, 5000);
   }
 
-  // login click
-  loginBtn.addEventListener('click', () => {
+  function tryLogin() {
     const user = usernameInput.value.trim();
     const pass = passwordInput.value.trim();
-    if (!user) {
-      loginMsg.textContent = 'Please type her name ❤️';
-      return;
-    }
-    if (pass === SECRET) {
-      showDesktop(user);
-    } else {
-      loginMsg.textContent = "Hmm, that doesn't feel right... try again.";
-      passwordInput.value = '';
-    }
-  });
-
-  // if username stored
-  const saved = localStorage.getItem('loveos_user');
-  if (saved) {
-    usernameInput.value = saved;
+    if (!user) { loginMsg.textContent = "Enter an operator name first."; return; }
+    if (pass === SECRET) { showDesktop(user); }
+    else { loginMsg.textContent = "Wrong passphrase for this demo. Hint: secure"; passwordInput.value = ""; }
   }
-
-  // Love App click
-  loveIcon.addEventListener('click', openLoveApp);
-
-  function openLoveApp() {
-    const existing = document.querySelector('.app-window');
-    if (existing) {
-      existing.style.zIndex = 999;
-      return;
-    }
-    const win = document.createElement('div');
-    win.className = 'app-window';
-    win.innerHTML = `
-      <div class="app-header">
-        <div class="app-title">Love App</div>
-        <div><button class="btn closeBtn" title="Close">✕</button></div>
-      </div>
-      <div class="app-body">
-        <div class="greet">Hello, <span id="gName"></span> 💕</div>
-        <div class="typewriter" id="typewriter"></div>
-        <button class="heart-btn" id="heartBtn">Send a Heart</button>
-        <div class="muted small" style="margin-top:10px">Tap the heart, watch the magic ✨</div>
-      </div>
-    `;
-    windows.appendChild(win);
-    document.getElementById('gName').textContent = localStorage.getItem('loveos_user') || 'My Love';
-    win.querySelector('.closeBtn').addEventListener('click', () => win.remove());
-    const lines = [
-      "On this special day I want you to know...",
-      "You're the melody in my favourite song,",
-      "the smile I chase, and the calm in my storm.",
-      "I love you more than words can hold. 💖"
-    ];
-    typeWriter(lines, document.getElementById('typewriter'));
-    document.getElementById('heartBtn').addEventListener('click', (e) => burstHearts(e.target));
-  }
-
-  function typeWriter(lines, el, speed = 28, linePause = 600) {
-    el.innerHTML = '';
-    let i = 0;
-    function nextLine() {
-      if (i >= lines.length) return;
-      const text = lines[i++];
-      let idx = 0;
-      const span = document.createElement('span');
-      el.appendChild(span);
-      const t = setInterval(() => {
-        if (idx < text.length) {
-          span.textContent += text[idx++];
-        } else {
-          clearInterval(t);
-          el.appendChild(document.createElement('br'));
-          setTimeout(nextLine, linePause);
-        }
-      }, speed);
-    }
-    nextLine();
-  }
-
-  function burstHearts(target) {
-    const rect = target.getBoundingClientRect();
-    const seedX = rect.left + rect.width / 2;
-    const seedY = rect.top + rect.height / 2;
-    for (let i = 0; i < 12; i++) {
-      const h = document.createElement('div');
-      h.className = 'small-heart';
-      h.style.position = 'fixed';
-      h.style.left = (seedX + (Math.random() - 0.5) * 120) + 'px';
-      h.style.top = (seedY + (Math.random() - 0.5) * 60) + 'px';
-      h.style.width = (8 + Math.random() * 10) + 'px';
-      h.style.height = h.style.width;
-      h.style.background = `radial-gradient(circle at 30% 30%, #fff, ${['#ff6fa3','#ff3d9a','#ff90c1'][Math.floor(Math.random() * 3)]})`;
-      h.style.transform = `rotate(${Math.random() * 45}deg)`;
-      h.style.borderRadius = '6px 6px 12px 12px';
-      h.style.zIndex = 9999;
-      h.style.pointerEvents = 'none';
-      document.body.appendChild(h);
-      const animDuration = 1000 + Math.random() * 900;
-      h.animate([
-        { transform: `translateY(0) scale(0.8)`, opacity: 1 },
-        { transform: `translateY(-120px) translateX(${(Math.random() - 0.5) * 100}px) scale(1)`, opacity: 0 }
-      ], { duration: animDuration, easing: 'cubic-bezier(.2,.8,.2,1)' });
-      setTimeout(() => h.remove(), animDuration + 40);
-    }
-  }
-
-  function startFloatingHearts() {
-    const colors = ['#ffd6ea', '#ffb3d6', '#ff7ab6', '#ff4da6'];
-    setInterval(() => {
-      const h = document.createElement('div');
-      h.className = 'float-heart';
-      const size = 12 + Math.random() * 28;
-      h.style.width = h.style.height = size + 'px';
-      h.style.left = Math.random() * 100 + '%';
-      h.style.top = 100 + 'vh';
-      h.style.position = 'fixed';
-      h.style.zIndex = 1;
-      h.style.pointerEvents = 'none';
-      h.style.background = colors[Math.floor(Math.random() * colors.length)];
-      h.style.opacity = (0.2 + Math.random() * 0.6).toString();
-      h.style.borderRadius = '50%';
-      floatingHearts.appendChild(h);
-      const floatDur = 7000 + Math.random() * 9000;
-      h.animate([
-        { transform: `translateY(0) scale(0.6)`, opacity: h.style.opacity },
-        { transform: `translateY(-120vh) scale(1.1)`, opacity: 0 }
-      ], { duration: floatDur, easing: 'linear' });
-      setTimeout(() => h.remove(), floatDur + 40);
-    }, 750);
-  }
+  loginBtn.addEventListener("click", tryLogin);
+  passwordInput.addEventListener("keydown", (e) => { if (e.key === "Enter") tryLogin(); });
+  const saved = localStorage.getItem("secureos_user");
+  if (saved) usernameInput.value = saved;
 });

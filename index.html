@@ -3,53 +3,39 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>LoveOS — For Her ❤️</title>
+  <title>SecureOS — Analyst Console</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Login overlay -->
   <div id="loginOverlay" class="overlay">
     <div class="login-card">
-      <h1>Love OS</h1>
-      <p class="muted">Enter your name and the secret password</p>
-
-      <input id="username" class="txt" type="text" placeholder="Your name (or nickname)" />
-      <input id="password" class="txt" type="password" placeholder="Password (hint: 'Our love')" />
-
-      <button id="loginBtn" class="btn">Enter</button>
+      <div class="shield-mark">🛡️</div>
+      <h1>SecureOS</h1>
+      <p class="muted">Analyst console — 100% web-based, local-first</p>
+      <p class="muted small">SecureOS v1.0 &bull; build 2026-10-29 &bull; no data leaves your browser</p>
+      <input id="username" class="txt" type="text" placeholder="Operator name (e.g. analyst)" autocomplete="username" />
+      <input id="password" class="txt" type="password" placeholder="Passphrase (demo: secure)" autocomplete="current-password" />
+      <button id="loginBtn" class="btn">Enter Console</button>
       <p id="loginMsg" class="muted small"></p>
+      <p class="muted small">Demo login only — this is not real authentication. Files and notes stay in this browser's local storage.</p>
     </div>
   </div>
-  
 
-  <!-- Desktop -->
   <div id="desktop" class="hidden">
     <div class="wallpaper"></div>
-
-    <div class="floating-hearts" id="floatingHearts"></div>
-
-    <div class="icons">
-      <div class="icon" id="loveIcon" title="Love App">
-        <!-- simple heart svg -->
-        <svg viewBox="0 0 24 24" class="heart-icon" aria-hidden="true">
-          <path d="M12 21s-7-4.35-9.19-6.3C.96 11.98 4.22 6 8.5 6c1.74 0 3.14.86 3.5 2.09C12.36 6.86 13.76 6 15.5 6 19.78 6 23.04 11.98 21.19 14.7 19 16.65 12 21 12 21z"></path>
-        </svg>
-        <span>Love</span>
-      </div>
-    </div>
-
+    <div class="scan-grid" id="scanGrid"></div>
+    <div class="icons" id="desktopIcons"></div>
     <div id="windows"></div>
-
+    <div class="ticker" id="ticker">🛡️ SecureOS online &bull; all tools run locally &bull; lab use only — never scan systems you do not own or have permission to test.</div>
     <div class="taskbar">
-      <div class="taskbar-left">💖 LoveOS</div>
-      <div class="taskbar-right" id="taskUser">guest</div>
+      <div class="taskbar-left">🛡️ SecureOS v1.0</div>
+      <div class="taskbar-right" id="taskUser">analyst</div>
     </div>
   </div>
-  <script src="loveos/vfs.js"defer></script>
-  <script src="loveos/filesystem.js"defer></script>
-  <script src="loveos/toolbar.js" defer></script>
-  <script src="app.js" defer></script>
-  
 
+  <script src="secureos/filesystem.js" defer></script>
+  <script src="secureos/vfs.js" defer></script>
+  <script src="apps/secure-apps.js" defer></script>
+  <script src="app.js" defer></script>
 </body>
 </html>
