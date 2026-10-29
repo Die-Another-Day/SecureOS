@@ -63,36 +63,31 @@ isolation.
   precisely so the demo cannot be misused that way.
 - **Demo login is not security:** anyone with the page can enter. Do not
   put real production secrets in Vault Notes.
-- **Reference tools are not integrated:** Nmap, Wireshark, Suricata/Zeek
-  and Wazuh are listed in `backend/tools/catalog.json` as the real tools
-  to learn next, in your own lab. SecureOS does not install or run them.
+- **Reference tools in v1 vs v2:** in the v1 web demo, Nmap, Wireshark,
+  Suricata/Zeek and Wazuh were reference tools only — the demo did not
+  install or run them. In v2 they are real, inside the bootable OS
+  (see `secureos-v2/README-v2.md`).
 
-## Backend hardening (v1.0, important)
+## Backend hardening (v1.0 history, now cleaned up)
 
-The old backend (`backend/server.js`) could clone **any** GitHub URL,
+The original LoveOS backend could clone **any** GitHub URL,
 `npm install` it, and run it with `spawn(..., { shell: true })`. That is
-remote code execution if the server is ever exposed, so v1.0 removes it:
-
-- `/api/install`, `/api/run`, `/api/uninstall` now return **403** with an
-  explanation, instead of executing anything.
-- The server is now only `/api/health` + `/api/tools` (read-only catalogue).
-- `backend/tools/registry.json` no longer lists PhoneSploit-Pro. An
-  exploitation tool is not a default SecureOS app.
-- The frontend does not need the backend at all. To run the backend
-  catalogue server (optional):
-
-```bash
-cd backend && npm install && npm start   # http://localhost:3001/api/health
-```
+remote code execution if the server is ever exposed, so v1.0 hardened it
+to a catalogue-only server, and the v1 cleanup then removed the whole
+Node backend (`backend/`) from this repo. SecureOS v2 does not use it at
+all: its backend is `secureos-v2/server.py` (Python stdlib only, localhost
+only, allowlisted tools only — no clone, install, or arbitrary run).
+No exploitation tool is a SecureOS app, in v1 or v2.
 
 ## What v1.0 deliberately does NOT do
 
 - No real network scanning, packet capture, or exploitation — those need
   a real lab, real permission, and real tools, not a browser demo.
 - No user accounts, no cloud sync, no analytics.
-- The legacy `loveos/` folder is left untouched in v1.0 for history; the
-  live desktop now loads from `secureos/`. A future cleanup can delete
-  the legacy folder once you confirm nothing else references it.
+- Cleanup (29 Oct 2026): the legacy `loveos/` folder and the v1 Node
+  backend (`backend/`) were removed from main — 29 files in total.
+  They remain in git history only. The live desktop loads from
+  `secureos/`; the real OS is in `secureos-v2/`.
 
 ## Origin
 
