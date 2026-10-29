@@ -1,0 +1,15 @@
+[Unit]
+Description=SecureOS v2 console (localhost only)
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/secureos/server.py
+Restart=on-failure
+User=root
+Environment=SECUREOS_ALLOW_PUBLIC=0
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

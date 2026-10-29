@@ -1,3 +1,19 @@
+# SecureOS — v2 is a real OS, v1 was a web demo
+
+> **v2 (new, 2026-10-29): SecureOS is now a REAL bootable Linux OS** —
+> Debian 12 bookworm, real kernel 6.1.0-54, GRUB BIOS, systemd, and a real
+> Python backend that runs real `nmap`, real log parsing and real hashing
+> on `http://127.0.0.1:8000` only. The v1 web desktop below is still here
+> as the console front end, but v2 is what boots on hardware or in QEMU.
+> Full details, flash/dd instructions, safety rules and the verified boot
+> proof: [`secureos-v2/README-v2.md`](secureos-v2/README-v2.md).
+> Try it: `./secureos-v2/run-qemu.sh` (needs the `secureos-v2.img` build
+> from `./secureos-v2/build-image.sh` — the multi-GB image itself is NOT
+> in this repo). Log in as `analyst` / `secure` (lab password — change it).
+> SOC triage scenarios remain **training** scenarios in v2 as well.
+> Nothing here is an exploitation tool, and scans are allowlisted to
+> localhost + RFC1918 private ranges by default.
+
 # SecureOS v1.0 — a web-based analyst OS
 
 **SecureOS is LoveOS, transformed in place.** The original project was a web
