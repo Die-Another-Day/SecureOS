@@ -1,1 +1,0 @@
-{"note":"SecureOS v1.0: this registry no longer lists executable tools. The old PhoneSploit-Pro entry was removed — an exploitation tool is not a default SecureOS app, and the hardened backend cannot install or run arbitrary repos. See catalog.json for built-in apps and lab references.","tools":{},"version":"1.0"}

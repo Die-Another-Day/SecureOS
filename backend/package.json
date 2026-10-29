@@ -1,1 +1,0 @@
-{"dependencies":{"cors":"^2.8.5","express":"^4.19.2","morgan":"^1.10.0"},"main":"server.js","name":"secureos-backend","private":true,"scripts":{"start":"node server.js"},"type":"module","version":"1.0.0"}
