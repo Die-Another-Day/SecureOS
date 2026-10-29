@@ -1,0 +1,14 @@
+{
+  "tools": {
+    "phonosploit": {
+      "name": "phonosploit",
+      "repo": "https://github.com/AzeemIdrisi/PhoneSploit-Pro.git",
+      "installedAt": "2025-08-14T10:10:04.294Z"
+    },
+    "slug": {
+      "name": "slug",
+      "repo": "https://github.com/sindresorhus/slugify.git",
+      "installedAt": "2025-08-14T13:00:51.540Z"
+    }
+  }
+}
