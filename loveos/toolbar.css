@@ -1,0 +1,61 @@
+#love-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  background: linear-gradient(to right, #ff80ab, #ff4081);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 8px;
+  z-index: 2000;
+  font-family: 'Inter', sans-serif;
+}
+
+.toolbar-left, .toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#love-toolbar button {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#menu-dropdown {
+  position: absolute;
+  top: 40px;
+  left: 5px;
+  background: white;
+  color: black;
+  padding: 5px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+#menu-dropdown .menu-item {
+  padding: 6px 12px;
+  cursor: pointer;
+}
+#menu-dropdown .menu-item:hover {
+  background: #ffe4ec;
+}
+
+.hidden {
+  display: none;
+}
+
+#time-date {
+  text-align: right;
+  font-size: 14px;
+}
+#time-date small {
+  display: block;
+  font-size: 10px;
+  color: #ffd6ea;
+}

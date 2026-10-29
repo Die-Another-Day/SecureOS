@@ -1,0 +1,164 @@
+:root{
+  --pink1:#ff7ab6;
+  --pink2:#ff4da6;
+  --accent:#ffd6ea;
+  --soft:#ffeef8;
+  --win-bg: rgba(255,255,255,0.06);
+}
+
+/* reset */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial}
+.hidden{display:none}
+
+/* LOGIN OVERLAY */
+.overlay{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.6));
+  z-index:1000;
+}
+.login-card{
+  width:320px;padding:28px;border-radius:14px;
+  background:linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  border:2px solid rgba(255,255,255,0.06);backdrop-filter: blur(6px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  text-align:center;color:white;
+}
+.login-card h1{margin:0 0 6px;font-size:28px;color:var(--pink2);text-shadow:0 2px 12px rgba(255,77,166,0.12)}
+.muted{color:rgba(255,255,255,0.75)}
+.small{font-size:12px;margin-top:10px}
+.txt{
+  width:100%;padding:12px;border-radius:10px;margin:10px 0;border:2px solid rgba(255,255,255,0.08);
+  background:rgba(0,0,0,0.4);color:#fff;font-size:15px;outline:none;
+  box-shadow: 0 0 10px rgba(255,122,182,0.08) inset;
+}
+.btn{
+  width:100%;padding:10px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--pink1),var(--pink2));
+  color:white;font-weight:600;font-size:16px;cursor:pointer;
+  box-shadow:0 8px 20px rgba(255,77,166,0.18);
+}
+.btn:active{transform:translateY(1px)}
+
+/* DESKTOP & WALLPAPER */
+.wallpaper{
+  position:fixed;inset:0;background: radial-gradient(ellipse at 20% 30%, rgba(255,218,240,0.12), transparent 20%),
+    linear-gradient(135deg,#ffe6f5 0%, #ffd6ea 40%, #ffd1f0 100%);
+  filter: saturate(110%);background-attachment: fixed;
+}
+
+/* floating hearts container (absolute over wallpaper) */
+.floating-hearts{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:2}
+
+/* icons */
+.icons{
+  position:absolute;left:30px;top:70px;display:flex;flex-direction:column;gap:14px;z-index:10;
+}
+.icon{
+  width:92px;height:92px;border-radius:14px;background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+  border:2px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:white;cursor:pointer;backdrop-filter: blur(4px);
+  transition:transform .18s ease, box-shadow .2s;
+  box-shadow: 0 6px 18px rgba(255,77,166,0.06);
+}
+.icon:hover{transform:translateY(-6px);box-shadow: 0 16px 40px rgba(255,77,166,0.12)}
+.icon span{font-size:14px;margin-top:8px;color:#fff}
+.heart-icon{width:36px;height:36px;fill:var(--pink2);filter: drop-shadow(0 6px 12px rgba(255,77,166,0.12))}
+
+/* windows container */
+#windows{position:absolute;left:180px;top:60px;right:30px;bottom:60px;pointer-events:auto;z-index:20}
+
+/* window style */
+.app-window{
+  width:540px;max-width:calc(100% - 220px);
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+  border-radius:12px;border:1px solid rgba(255,255,255,0.06);
+  overflow:hidden;box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+  position:relative;
+}
+.app-header{
+  height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+  border-bottom:1px solid rgba(255,255,255,0.02);
+}
+.app-title{color:var(--pink2);font-weight:700}
+.app-body{padding:22px;color:#fff}
+
+/* typewriter text */
+.typewriter{font-size:18px;line-height:1.5;color:#fff;margin-top:12px;min-height:66px}
+.greet{font-size:24px;font-weight:800;color:#fff;text-shadow:0 6px 24px rgba(255,77,166,0.14)}
+
+/* heart button */
+.heart-btn{
+  margin-top:14px;padding:14px 18px;border-radius:12px;border:none;cursor:pointer;
+  background:linear-gradient(90deg,var(--pink2),#ff3d9a);color:white;font-weight:700;
+  box-shadow: 0 10px 26px rgba(255,77,166,0.14);
+}
+.heart-burst{
+  pointer-events:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9999;
+}
+
+/* taskbar */
+.taskbar{
+  position:fixed;left:0;right:0;bottom:0;height:56px;background:linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.28));
+  display:flex;align-items:center;justify-content:space-between;padding:0 18px;color:white;z-index:999;
+  border-top:1px solid rgba(255,255,255,0.03)
+}
+.taskbar-left{font-weight:700;color:var(--pink2)}
+.taskbar-right{opacity:0.9}
+
+/* small helper */
+.muted{opacity:0.85;color:#fff}
+
+/* heart animation keyframes */
+@keyframes popUp {
+  from{transform: translateY(12px) scale(.6); opacity:0}
+  30%{opacity:1}
+  to{transform: translateY(-140px) scale(1); opacity:0}
+}
+
+/* Default app window style for all apps */
+.app-windowss {
+  position: absolute;
+  top: 100px;
+  left: 100px;
+  width: 700px;
+  height: 650px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+
+/* Floating style for terminal only */
+.app-windowss.terminal {
+  background: transparent;
+  box-shadow: 0 0 20px rgba(255, 0, 100, 0.6);
+  border-radius: 10px;
+}
+
+/* Hide titlebar for terminal */
+.app-windowss.terminal .app-titlebar {
+  display: none;
+}
+
+/* Full iframe height when titlebar is gone */
+.app-windowss.terminal .app-content {
+  height: 100%;
+}
+
+
+.floating-terminal {
+  position: absolute;
+  top: 100px;
+  left: 300px;
+  z-index: 9999;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(255, 0, 100, 0.6);
+}
+
+.terminal-content {
+  width: 660px;
+  height: 415px;
+  border: none;
+}

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LoveOS — For Her ❤️</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Login overlay -->
+  <div id="loginOverlay" class="overlay">
+    <div class="login-card">
+      <h1>Love OS</h1>
+      <p class="muted">Enter your name and the secret password</p>
+
+      <input id="username" class="txt" type="text" placeholder="Your name (or nickname)" />
+      <input id="password" class="txt" type="password" placeholder="Password (hint: 'Our love')" />
+
+      <button id="loginBtn" class="btn">Enter</button>
+      <p id="loginMsg" class="muted small"></p>
+    </div>
+  </div>
+  
+
+  <!-- Desktop -->
+  <div id="desktop" class="hidden">
+    <div class="wallpaper"></div>
+
+    <div class="floating-hearts" id="floatingHearts"></div>
+
+    <div class="icons">
+      <div class="icon" id="loveIcon" title="Love App">
+        <!-- simple heart svg -->
+        <svg viewBox="0 0 24 24" class="heart-icon" aria-hidden="true">
+          <path d="M12 21s-7-4.35-9.19-6.3C.96 11.98 4.22 6 8.5 6c1.74 0 3.14.86 3.5 2.09C12.36 6.86 13.76 6 15.5 6 19.78 6 23.04 11.98 21.19 14.7 19 16.65 12 21 12 21z"></path>
+        </svg>
+        <span>Love</span>
+      </div>
+    </div>
+
+    <div id="windows"></div>
+
+    <div class="taskbar">
+      <div class="taskbar-left">💖 LoveOS</div>
+      <div class="taskbar-right" id="taskUser">guest</div>
+    </div>
+  </div>
+  <script src="loveos/vfs.js"defer></script>
+  <script src="loveos/filesystem.js"defer></script>
+  <script src="loveos/toolbar.js" defer></script>
+  <script src="app.js" defer></script>
+  
+
+</body>
+</html>
