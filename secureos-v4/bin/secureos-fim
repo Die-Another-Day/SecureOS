@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+"""secureos-fim — real file-integrity checker for SecureOS v4 lab.
+
+  secureos-fim --init    Hash the watched lab files, save the manifest.
+  secureos-fim --check   Compare current hashes to the manifest and
+                         print CHANGED / NEW / MISSING lines, or OK.
+
+Watched: /srv/labapp/lab.db, /srv/labapp/flags/flag3.txt,
+/home/labuser/flag2.txt, /srv/labapp/plugins/* (names + hashes),
+/etc/secureos-lab/state. Hashes are real SHA-256, not placeholders.
+Manifest: /var/lib/secureos-lab/manifest.json
+"""
+import hashlib
+import json
+import os
+import sys
+from pathlib import Path
+
+MANIFEST = "/var/lib/secureos-lab/manifest.json"
+WATCH = ["/srv/labapp/lab.db", "/srv/labapp/flags/flag3.txt",
+         "/home/labuser/flag2.txt", "/etc/secureos-lab/state"]
+
+
+def snapshot():
+    snap = {}
+    for p in WATCH:
+        try:
+            snap[p] = hashlib.sha256(Path(p).read_bytes()).hexdigest()
+        except OSError:
+            snap[p] = None
+    plug = Path("/srv/labapp/plugins")
+    if plug.is_dir():
+        for f in sorted(plug.iterdir()):
+            if f.is_file():
+                try:
+                    snap[str(f)] = hashlib.sha256(f.read_bytes()).hexdigest()
+                except OSError:
+                    pass
+    return snap
+
+
+def main():
+    if sys.argv[1:] == ["--init"]:
+        os.makedirs(os.path.dirname(MANIFEST), exist_ok=True)
+        tmp = MANIFEST + ".tmp"
+        Path(tmp).write_text(json.dumps(snapshot(), indent=2))
+        os.replace(tmp, MANIFEST)
+        print(f"FIM manifest written: {MANIFEST}")
+        return 0
+    if sys.argv[1:] == ["--check"]:
+        try:
+            old = json.loads(Path(MANIFEST).read_text())
+        except (OSError, ValueError):
+            print("FIM: no usable manifest — run secureos-fim --init first")
+            return 2
+        now = snapshot()
+        changed = []
+        for k in sorted(set(old) | set(now)):
+            if k not in old:
+                changed.append(f"NEW {k}")
+            elif k not in now:
+                changed.append(f"MISSING {k}")
+            elif old[k] != now[k]:
+                changed.append(f"CHANGED {k}")
+        if changed:
+            print("\n".join(changed))
+        else:
+            print("FIM OK — no watched file changed")
+        return 0
+    print(__doc__)
+    return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())

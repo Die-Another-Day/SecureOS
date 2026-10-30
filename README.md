@@ -1,3 +1,10 @@
+# SecureOS — v4 is a real Red vs Blue lab, v3 added GUI on demand
+
+> **v4 (new, 2026-10-30): SecureOS is now a real, networked Red vs Blue classroom lab — NOT a simulation.** Install it on one device, and students on the same private LAN attack it and defend it for real: real SQL injection, real SSH and plugin-upload flags, real journal/log/FIM alerts, and real IR — contain, eradicate, recover, reset. Lab mode is OFF by default; `secureos-lab --enable` opens it to a private LAN address only, and `secureos-lab --stop` kills it all.
+> Full details: [`secureos-v4/README-v4.md`](secureos-v4/README-v4.md).
+> Try it: `./secureos-v4/run-qemu.sh`, then `secureos-lab --enable` inside. The multi-GB image itself is NOT in this repo.
+> LAB ONLY, private LAN only, with consent of everyone on that LAN — never the public internet.
+
 # SecureOS — v3 adds GUI on demand + real OS basics, v2 was the first real OS
 
 > **v3 (new, 2026-10-30): SecureOS now has the basics every OS has —

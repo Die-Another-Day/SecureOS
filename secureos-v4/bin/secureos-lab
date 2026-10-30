@@ -1,0 +1,264 @@
+#!/usr/bin/env python3
+"""secureos-lab — LAN lab mode for SecureOS v4. LAB ONLY.
+
+Default boot: lab OFF, console on 127.0.0.1:8000 only (v3 behaviour).
+  secureos-lab --enable   Open the lab on a PRIVATE LAN IP only.
+  secureos-lab --disable  Same as --stop.
+  secureos-lab --stop     Shut ALL lab services, restore localhost-only.
+  secureos-lab --status   Show lab state, LAN IP, services, firewall.
+  secureos-lab --reset    Restore lab services/flags to initial state.
+
+Safety enforced in code, not just in docs:
+  * Refuses to enable if the primary IP is not RFC1918 private.
+  * Never binds 0.0.0.0. The console bind IP is the detected LAN IP.
+  * Prints a LAB-ONLY warning on enable.
+  * --stop stops labapp, SSH and vsftpd (if installed), removes the
+    nftables lab table, removes the console bind override, restarts
+    the console on localhost only, deletes uploaded plugins and
+    attacker persistence (authorized_keys, lab cron files).
+Must run as root (sudo).
+"""
+import ipaddress
+import os
+import subprocess
+import sys
+import time
+
+STATE_DIR = "/etc/secureos-lab"
+STATE = os.path.join(STATE_DIR, "state")
+ENV = os.path.join(STATE_DIR, "env")
+IRLOG = "/var/log/secureos-lab/ir.log"
+APPLOG = "/var/log/secureos-lab/app.log"
+
+
+def run(args, check=False):
+    p = subprocess.run(args, capture_output=True, text=True, timeout=60)
+    return p
+
+
+def log_ir(msg):
+    try:
+        os.makedirs(os.path.dirname(IRLOG), exist_ok=True)
+        with open(IRLOG, "a") as f:
+            f.write(f"{time.strftime('%Y-%m-%dT%H:%M:%S')} IR- {msg}\n")
+        subprocess.run(["logger", "-t", "secureos-lab", f"IR- {msg}"],
+                       capture_output=True, timeout=5)
+    except Exception:
+        pass
+
+
+def lan_ip():
+    # MUST be the machine's OWN address, not the gateway. `ip route get`
+    # prints "... via <gateway> ... src <own-ip> ...", so take the token
+    # after 'src' only. Taking the first private token was a real bug
+    # (it picked the gateway 10.0.2.2 in QEMU) and broke lab binding.
+    p = run(["ip", "route", "get", "1.1.1.1"])
+    toks = p.stdout.split()
+    if "src" in toks:
+        try:
+            ip = ipaddress.ip_address(toks[toks.index("src") + 1])
+            if ip.is_private and not ip.is_loopback:
+                return str(ip)
+        except (ValueError, IndexError):
+            pass
+    p = run(["ip", "-brief", "addr"])
+    for line in p.stdout.splitlines():
+        for tok in line.split():
+            if "/" in tok:
+                try:
+                    ip = ipaddress.ip_address(tok.split("/")[0])
+                    if ip.is_private and not ip.is_loopback:
+                        return str(ip)
+                except ValueError:
+                    pass
+    return None
+
+
+def nft_apply(ip):
+    rules = f"""table inet secureos_lab {{
+  chain input {{
+    type filter hook input priority 0; policy accept;
+    iif "lo" accept
+    ct state established,related accept
+    ip saddr {{ 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 }} tcp dport {{ 8000, 8080, 2222, 21 }} accept
+    ip saddr != {{ 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 }} tcp dport {{ 8000, 8080, 2222, 21 }} drop
+  }}
+}}
+"""
+    with open("/etc/secureos-lab/nft.conf", "w") as f:
+        f.write(rules)
+    p = run(["nft", "-f", "/etc/secureos-lab/nft.conf"])
+    return p.returncode == 0, (p.stdout + p.stderr)
+
+
+def svc(action, name):
+    return run(["systemctl", action, name])
+
+
+def enable():
+    ip = lan_ip()
+    addr_out = run(["ip", "-brief", "addr"]).stdout
+    if ip and ip not in addr_out:
+        print(f"REFUSED: detected IP {ip} is not assigned to this machine (gateway bug guard).")
+        return 2
+    if not ip:
+        print("REFUSED: no private RFC1918 LAN IP detected. Connect to a private LAN first.")
+        return 2
+    print("=" * 70)
+    print("LAB ONLY — SecureOS v4 Red vs Blue lab")
+    print("This machine will now be ATTACKABLE on its private LAN.")
+    print("Private LAN only. With consent of everyone on that LAN.")
+    print("NEVER on the public internet. NEVER on a campus/corporate")
+    print("network without written permission. Lab services run as")
+    print("unprivileged users where possible. Stop with: secureos-lab --stop")
+    print("=" * 70)
+    os.makedirs(STATE_DIR, exist_ok=True)
+    os.makedirs("/var/log/secureos-lab", exist_ok=True)
+    # Unmask SSH only for the lab, on port 2222 via a drop-in override.
+    # The base ssh.service remains masked in the image; we use sshd directly
+    # through a dedicated unit secureos-ssh-lab.service if present, else
+    # unmask + start ssh and reconfigure its port below.
+    # Simpler, auditable path: run /usr/sbin/sshd on 2222 via systemd unit.
+    with open(ENV, "w") as f:
+        f.write(f"SECUREOS_BIND_IP={ip}\n")
+    with open(STATE, "w") as f:
+        f.write("enabled\n")
+    ok, out = nft_apply(ip)
+    print(f"Firewall (nftables lab table): {'applied' if ok else 'FAILED: ' + out}")
+    # Lab app: binds to LAN IP (passed as argument by its unit via env file)
+    svc("restart", "secureos-labapp.service")
+    svc("restart", "secureos-ssh-lab.service")
+    # Console: restart with new bind IP from EnvironmentFile
+    svc("restart", "secureos.service")
+    time.sleep(2)
+    log_ir(f"LAB ENABLED lan_ip={ip}")
+    print(f"LAN IP: {ip}")
+    print(f"SOC console (LAN): http://{ip}:8000")
+    print(f"Lab web app (LAN): http://{ip}:8080")
+    print(f"Lab SSH (LAN): ssh -p 2222 labuser@{ip}  (LAB credential only)")
+    print("Attackers: use real tools from their own LAN machines (nmap, curl, ssh).")
+    print("Defenders: watch /api/alerts, /api/incidents and /api/flags on the console.")
+    return 0
+
+
+def stop():
+    print("Stopping all lab services and restoring localhost-only mode...")
+    svc("stop", "secureos-labapp.service")
+    svc("stop", "secureos-ssh-lab.service")
+    svc("stop", "ssh.service")
+    svc("stop", "vsftpd.service")
+    # Re-mask SSH the way v3 shipped it
+    for link in ("/etc/systemd/system/ssh.service", "/etc/systemd/system/ssh.socket",
+                 "/etc/systemd/system/sshd.service"):
+        try:
+            if os.path.islink(link) or os.path.exists(link):
+                os.unlink(link)
+            os.symlink("/dev/null", link)
+        except OSError:
+            pass
+    run(["nft", "delete", "table", "inet", "secureos_lab"])
+    # Remove attacker persistence created through lab services
+    for cand in ("/home/labuser/.ssh/authorized_keys",
+                 "/home/labweb/.ssh/authorized_keys",
+                 "/srv/labapp/plugins"):
+        try:
+            if os.path.isdir(cand):
+                for n in os.listdir(cand):
+                    if n.endswith(".py"):
+                        os.unlink(os.path.join(cand, n))
+            elif os.path.isfile(cand):
+                os.unlink(cand)
+        except OSError:
+            pass
+    for cron in ("/var/spool/cron/crontabs/labuser", "/var/spool/cron/crontabs/labweb"):
+        try:
+            if os.path.exists(cron):
+                os.unlink(cron)
+        except OSError:
+            pass
+    try:
+        if os.path.exists(ENV):
+            os.unlink(ENV)
+    except OSError:
+        pass
+    os.makedirs(STATE_DIR, exist_ok=True)
+    with open(STATE, "w") as f:
+        f.write("disabled\n")
+    svc("restart", "secureos.service")
+    log_ir("LAB STOPPED — lab services off, console localhost-only")
+    print("Lab stopped. Console is back on http://127.0.0.1:8000 only.")
+    return 0
+
+
+def status():
+    state = "unknown"
+    try:
+        state = open(STATE).read().strip()
+    except OSError:
+        state = "disabled (never enabled)"
+    print(f"Lab state: {state}")
+    print(f"Detected LAN IP: {lan_ip() or 'none'}")
+    for name in ("secureos.service", "secureos-labapp.service", "secureos-ssh-lab.service", "ssh.service"):
+        p = run(["systemctl", "is-active", name])
+        print(f"  {name}: {p.stdout.strip()}")
+    p = run(["nft", "list", "table", "inet", "secureos_lab"])
+    print("  nftables lab table:", "present" if p.returncode == 0 else "absent")
+    if p.returncode == 0:
+        print(p.stdout[:1000])
+    return 0
+
+
+def reset():
+    print("Resetting lab to initial state for the next class...")
+    svc("stop", "secureos-labapp.service")
+    # Regenerate DB and flags (fresh random flags)
+    for cand in ("/srv/labapp/lab.db", "/srv/labapp/flags/flag3.txt"):
+        try:
+            os.unlink(cand)
+        except OSError:
+            pass
+    for n in os.listdir("/srv/labapp/plugins"):
+        try:
+            os.unlink(os.path.join("/srv/labapp/plugins", n))
+        except OSError:
+            pass
+    # Flag 2 is regenerated by the setup/reset helper (root-owned script)
+    p = run(["secureos-lab-reset-flags"])
+    print(p.stdout + p.stderr)
+    # Regenerate FIM manifest and clear app log for a clean timeline
+    run(["secureos-fim", "--init"])
+    try:
+        open(APPLOG, "w").close()
+    except OSError:
+        pass
+    log_ir("LAB RESET — flags, DB, plugins and FIM manifest restored")
+    # Only restart labapp if lab is enabled
+    try:
+        if open(STATE).read().strip() == "enabled":
+            svc("restart", "secureos-labapp.service")
+    except OSError:
+        pass
+    print("Lab reset done. New flags were generated (values are not printed here).")
+    return 0
+
+
+def main():
+    if os.geteuid() != 0:
+        print("secureos-lab must run as root (sudo secureos-lab ...)")
+        return 2
+    args = sys.argv[1:]
+    if args == ["--enable"]:
+        return enable()
+    if args in (["--stop"], ["--disable"]):
+        return stop()
+    if args == ["--status"]:
+        return status()
+    if args == ["--reset"]:
+        return reset()
+    print(__doc__)
+    print("Usage: secureos-lab --enable | --stop | --status | --reset")
+    return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())

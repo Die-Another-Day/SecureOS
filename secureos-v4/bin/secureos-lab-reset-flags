@@ -1,0 +1,11 @@
+#!/bin/bash
+# Regenerate flag 2 for labuser (root only, called by secureos-lab --reset).
+# Flag values are never printed here — the attacker must exploit to read them.
+set -euo pipefail
+[ "$(id -u)" = "0" ] || { echo "must run as root" >&2; exit 2; }
+FLAG="flag$(python3 -c 'import uuid; print(uuid.uuid4().hex[:16])')"
+printf '%s\n' "flag{$FLAG}" > /home/labuser/flag2.txt
+chown labuser:labuser /home/labuser/flag2.txt
+chmod 600 /home/labuser/flag2.txt
+[ "$(wc -c < /home/labuser/flag2.txt)" -gt 0 ] || { echo "flag2 write FAILED (empty)" >&2; exit 3; }
+echo "flag2 regenerated (value not printed)"

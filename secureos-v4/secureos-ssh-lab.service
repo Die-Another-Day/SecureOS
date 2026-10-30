@@ -1,0 +1,12 @@
+[Unit]
+Description=SecureOS v4 lab SSH on port 2222 (LAB ONLY, private LAN only)
+After=network.target
+[Service]
+Type=simple
+RuntimeDirectory=sshd
+ExecStart=/usr/sbin/sshd -D -p 2222 -o PermitRootLogin=no -o PasswordAuthentication=yes
+Restart=on-failure
+StandardOutput=journal
+StandardError=journal
+[Install]
+WantedBy=multi-user.target

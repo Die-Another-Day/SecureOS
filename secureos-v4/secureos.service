@@ -1,0 +1,14 @@
+[Unit]
+Description=SecureOS v4 console (localhost by default, LAN only in lab mode)
+After=network.target
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/secureos/server.py
+Restart=on-failure
+User=root
+Environment=SECUREOS_ALLOW_PUBLIC=0
+EnvironmentFile=-/etc/secureos-lab/env
+StandardOutput=journal
+StandardError=journal
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,13 @@
+[Unit]
+Description=SecureOS v4 lab vulnerable web app (LAB ONLY, private LAN only)
+After=network.target
+[Service]
+Type=simple
+User=labweb
+EnvironmentFile=-/etc/secureos-lab/env
+ExecStart=/usr/bin/python3 /srv/labapp/labapp.py $SECUREOS_BIND_IP
+Restart=on-failure
+StandardOutput=journal
+StandardError=journal
+[Install]
+WantedBy=multi-user.target
