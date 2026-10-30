@@ -1,3 +1,16 @@
+# SecureOS — v3 adds GUI on demand + real OS basics, v2 was the first real OS
+
+> **v3 (new, 2026-10-30): SecureOS now has the basics every OS has —
+> filesystem, drivers, logging, task manager, battery, Wi-Fi + Ethernet —
+> and the main new feature: GUI on demand.** Default boot is STILL CLI +
+> web console on http://127.0.0.1:8000. Inside the guest, run
+> `secureos-gui` (like WSL's `kex`) to start an XFCE desktop.
+> Full details: [`secureos-v3/README-v3.md`](secureos-v3/README-v3.md).
+> Try it: `./secureos-v3/run-qemu.sh` for CLI, or
+> `./secureos-v3/run-qemu-gui.sh` for a graphical QEMU display, then
+> `secureos-gui` inside. The multi-GB image itself is NOT in this repo.
+> SOC triage scenarios remain **training** scenarios in v3 as well.
+
 # SecureOS — v2 is a real OS, v1 was a web demo
 
 > **v2 (new, 2026-10-29): SecureOS is now a REAL bootable Linux OS** —

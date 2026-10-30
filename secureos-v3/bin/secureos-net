@@ -1,0 +1,28 @@
+#!/bin/bash
+# secureos-net — real network status. Wi-Fi scan ONLY if a Wi-Fi device exists.
+# Safety: this command reports status; it does NOT scan other people's networks.
+# The nmap scan API still only allows localhost + RFC1918 by default.
+echo "=== Interfaces ==="
+ip -brief addr 2>/dev/null || ip addr
+echo
+echo "=== NetworkManager devices ==="
+nmcli device status 2>/dev/null || echo "nmcli: not available"
+echo
+echo "=== Ethernet ==="
+ip link 2>/dev/null | grep -E "^[0-9]+: (en|eth)" || echo "No ethernet interface named en*/eth* found."
+echo
+echo "=== Wi-Fi ==="
+WIFI_DEV=""
+if command -v iw >/dev/null 2>&1; then
+  WIFI_DEV=$(iw dev 2>/dev/null | awk '/Interface/{print $2; exit}')
+fi
+if [ -z "$WIFI_DEV" ] && command -v nmcli >/dev/null 2>&1; then
+  WIFI_DEV=$(nmcli -t -f DEVICE,TYPE device status 2>/dev/null | awk -F: '$2=="wifi"{print $1; exit}')
+fi
+if [ -z "$WIFI_DEV" ]; then
+  echo "No Wi-Fi device detected (VM / wired only). No Wi-Fi scan performed."
+else
+  echo "Wi-Fi device: $WIFI_DEV"
+  echo "Nearby networks (your own lab only — do not connect to networks you do not own):"
+  nmcli device wifi list ifname "$WIFI_DEV" 2>&1 | head -20
+fi
