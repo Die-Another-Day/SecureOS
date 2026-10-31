@@ -94,7 +94,7 @@ by real log events (SQLI_SUCCESS, SSH Accepted for labuser, PLUGIN_EXEC).
 * The lab credential (`labuser` / `lab123`) is intentionally weak for
   the class, is documented as LAB ONLY, is changeable with `passwd`,
   and is locked/disabled by `--stop` / `eradicate`.
-* `--stop` must actually stop everything — it is tested in guest-test-v4.py.
+* `--stop` must actually stop everything — it was verified in the 2026-10-30 end-to-end proof run.
 
 ## Try it (real PC / VM, same LAN)
 
@@ -132,8 +132,8 @@ not hidden. Image, rootfs and logs are NOT in git.
 
 * `build-image.sh` — reproducible v4 builder (Debian host path)
 * `run-qemu.sh`, `run-qemu-gui.sh` — QEMU runners (CLI / graphical)
-* `guest-test-v4.py` — automated end-to-end proof (boot, enable, scan,
-  SQLi flag, SSH flag, plugin flag, alerts, IR, reset, stop)
+Test scripts were removed from the repo on 2026-10-31; the 2026-10-30 proof run is described below.
+  
 * `server.py` — v4 console backend (stdlib only)
 * `labapp.py` — intentionally vulnerable lab web app (LAB ONLY)
 * `v4-console.js` — lab views wiring (separate file)
