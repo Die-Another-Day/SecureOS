@@ -5,34 +5,7 @@
 > Try it: `./secureos-v4/run-qemu.sh`, then `secureos-lab --enable` inside. The multi-GB image itself is NOT in this repo.
 > LAB ONLY, private LAN only, with consent of everyone on that LAN — never the public internet.
 
-# SecureOS — v3 adds GUI on demand + real OS basics, v2 was the first real OS
-
-> **v3 (new, 2026-10-30): SecureOS now has the basics every OS has —
-> filesystem, drivers, logging, task manager, battery, Wi-Fi + Ethernet —
-> and the main new feature: GUI on demand.** Default boot is STILL CLI +
-> web console on http://127.0.0.1:8000. Inside the guest, run
-> `secureos-gui` (like WSL's `kex`) to start an XFCE desktop.
-> Full details: [`secureos-v3/README-v3.md`](secureos-v3/README-v3.md).
-> Try it: `./secureos-v3/run-qemu.sh` for CLI, or
-> `./secureos-v3/run-qemu-gui.sh` for a graphical QEMU display, then
-> `secureos-gui` inside. The multi-GB image itself is NOT in this repo.
-> SOC triage scenarios remain **training** scenarios in v3 as well.
-
-# SecureOS — v2 is a real OS, v1 was a web demo
-
-> **v2 (new, 2026-10-29): SecureOS is now a REAL bootable Linux OS** —
-> Debian 12 bookworm, real kernel 6.1.0-54, GRUB BIOS, systemd, and a real
-> Python backend that runs real `nmap`, real log parsing and real hashing
-> on `http://127.0.0.1:8000` only. The v1 web desktop below is still here
-> as the console front end, but v2 is what boots on hardware or in QEMU.
-> Full details, flash/dd instructions, safety rules and the verified boot
-> proof: [`secureos-v2/README-v2.md`](secureos-v2/README-v2.md).
-> Try it: `./secureos-v2/run-qemu.sh` (needs the `secureos-v2.img` build
-> from `./secureos-v2/build-image.sh` — the multi-GB image itself is NOT
-> in this repo). Log in as `analyst` / `secure` (lab password — change it).
-> SOC triage scenarios remain **training** scenarios in v2 as well.
-> Nothing here is an exploitation tool, and scans are allowlisted to
-> localhost + RFC1918 private ranges by default.
+# Earlier versions removed — v2 and v3 were removed from this repo on 2026-10-31, superseded by v4. They remain in git history only. v4 includes the GUI-on-demand and OS basics from v3 and the real bootable OS from v2.
 
 # SecureOS v1.0 — a web-based analyst OS
 
@@ -85,8 +58,8 @@ isolation.
   put real production secrets in Vault Notes.
 - **Reference tools in v1 vs v2:** in the v1 web demo, Nmap, Wireshark,
   Suricata/Zeek and Wazuh were reference tools only — the demo did not
-  install or run them. In v2 they are real, inside the bootable OS
-  (see `secureos-v2/README-v2.md`).
+  install or run them. In the bootable OS (v4) they are real, inside the OS
+  (see `secureos-v4/README-v4.md`).
 
 ## Backend hardening (v1.0 history, now cleaned up)
 
@@ -95,7 +68,7 @@ The original LoveOS backend could clone **any** GitHub URL,
 remote code execution if the server is ever exposed, so v1.0 hardened it
 to a catalogue-only server, and the v1 cleanup then removed the whole
 Node backend (`backend/`) from this repo. SecureOS v2 does not use it at
-all: its backend is `secureos-v2/server.py` (Python stdlib only, localhost
+all: its backend is `secureos-v4/server.py` (Python stdlib only, localhost
 only, allowlisted tools only — no clone, install, or arbitrary run).
 No exploitation tool is a SecureOS app, in v1 or v2.
 
@@ -107,7 +80,7 @@ No exploitation tool is a SecureOS app, in v1 or v2.
 - Cleanup (29 Oct 2026): the legacy `loveos/` folder and the v1 Node
   backend (`backend/`) were removed from main — 29 files in total.
   They remain in git history only. The live desktop loads from
-  `secureos/`; the real OS is in `secureos-v2/`.
+  `secureos/`; the real OS is in `secureos-v4/`.
 
 ## Origin
 
