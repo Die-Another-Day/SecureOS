@@ -306,7 +306,7 @@ chown -R 1000:1000 "$ROOTFS/home/analyst/.config"
 # --- 3. console frontend into /opt/secureos --------------------------------
 # Copy the v1 static frontend (index.html, app.js, style.css, apps/, secureos/)
 # so the OS console is the same desktop, now backed by the real server.
-# Frontend lives in the repo root. Work layout: SRC=.../secureos-build/secureos-v3,
+# Frontend lives in the repo root. Work layout: SRC=.../secureos-build/secureos-v4,
 # repo at .../secureos-build/loveos-repo. Repo layout: script inside the repo,
 # repo root is SRC/.. . Prefer the first candidate that actually has index.html.
 REPO_ROOT="${SECUREOS_REPO_ROOT:-}"
@@ -322,15 +322,13 @@ for f in index.html app.js style.css; do
 done
 cp -r "$REPO_ROOT/apps" "$REPO_ROOT/secureos" "$ROOTFS/opt/secureos/" 2>/dev/null || true
 cp "$SRC/server.py" "$ROOTFS/opt/secureos/server.py"
-cp "$SRC/v3-console.js" "$ROOTFS/opt/secureos/v3-console.js" 2>/dev/null || true
-if [ -f "$REPO_ROOT/secureos-v2/v2-console.js" ]; then cp "$REPO_ROOT/secureos-v2/v2-console.js" "$ROOTFS/opt/secureos/v2-console.js"; fi
-# Load the v2 + v3 wiring after the v1 app script, if present.
+# Load the v4 wiring after the v1 app script, if present.
 if grep -q 'app.js' "$ROOTFS/opt/secureos/index.html" 2>/dev/null; then
   python3 - "$ROOTFS/opt/secureos/index.html" <<'PYEOF'
 import sys
 p = sys.argv[1]
 s = open(p).read()
-for f in ("v2-console.js", "v3-console.js"):
+for f in ("v4-console.js",):
     if f not in s:
         s = s.replace("</body>", '<script src="%s"></script>\n</body>' % f)
 open(p, "w").write(s)
